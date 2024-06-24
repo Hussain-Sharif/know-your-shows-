@@ -2,7 +2,7 @@
 
 ### GET ALL SHOWS at ONCE in HOME
 GET http://localhost:3001/all?search=&language=&genre=&limit=&offset=&
-Authorization: Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikh1c3NhaW4iLCJwYXNzd29yZCI6Ikh1c3NhaW5AMDAiLCJpYXQiOjE3MTkyMzk2NzV9.aCw0Yl6LTAKZyw0H0njYVfctiL9qG5EQjKjS72Ug0Kk
+Authorization: Bearer  JWT TOKEN is pasted
 
 ### POST method For SignUp
 POST http://localhost:3001/signup/
@@ -19,8 +19,8 @@ POST http://localhost:3001/login/
 Content-Type: application/json
 
 {
-    "username":"Hussain",
-    "password":"Hussain@00"
+    "username":"",
+    "password":""
 }
 
 ### GET method for User Favoriates 
