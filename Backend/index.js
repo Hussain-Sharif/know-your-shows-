@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const bcrypt=require("bcrypt")
 const jwt=require("jsonwebtoken")
@@ -5,15 +6,16 @@ const path = require('path')
 
 const {open}=require('sqlite');
 const sqlite3=require('sqlite3');
+
 const app=express(); //Server instance
 
-app.use(express.json())
 
-const PORT=3001
+app.use(express.json())
 
 const dbPath = path.join(__dirname, "knowyourshows.db");
 
 let db = null;
+let PORT=process.env.PORT
 
 const initializeDBAndServer = async () => {
   try {
@@ -21,7 +23,7 @@ const initializeDBAndServer = async () => {
       filename: dbPath,
       driver: sqlite3.Database,
     });
-    app.listen(PORT, () => {
+    app.listen( PORT, () => {
       console.log(`Server Running at http://localhost:${PORT}/`);
     });
   } catch (e) {

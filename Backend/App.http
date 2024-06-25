@@ -1,21 +1,23 @@
-###
+### @{{$processEnv process environment variable name}}
+
+
 
 ### GET ALL SHOWS at ONCE in HOME
-GET http://localhost:3001/all?search=&language=&genre=&limit=&offset=&
+GET {{SERVER_URL}}/all?search=&language=&genre=&limit=&offset=
 Authorization: Bearer  JWT TOKEN is pasted
 
 ### POST method For SignUp
-POST http://localhost:3001/signup/
+POST {{SERVER_URL}}/signup/
 Content-Type: application/json
 
 {
-    "username":"Hussain",
-    "password":"Hussain@00",
-    "email":"99sharif00@gmail.com"
+    "username":"",
+    "password":"",
+    "email":""
 }
 
 ### POST method For Login
-POST http://localhost:3001/login/
+POST {{SERVER_URL}}/login/
 Content-Type: application/json
 
 {
