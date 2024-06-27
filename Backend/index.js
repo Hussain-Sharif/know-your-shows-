@@ -1,5 +1,9 @@
 require('dotenv').config()
 const express = require('express');
+// The error you're encountering is a Cross-Origin Resource Sharing (CORS) issue. CORS is a security feature implemented by web browsers to prevent web pages from making requests to a different domain than the one that served the web page.
+const cros=require("cors")
+// Image to generate local to URL
+// const cloudinary=require("cloudinary")
 const bcrypt=require("bcrypt")
 const jwt=require("jsonwebtoken")
 const path = require('path') 
@@ -9,13 +13,27 @@ const sqlite3=require('sqlite3');
 
 const app=express(); //Server instance
 
-
+app.use(cros())
 app.use(express.json())
+
 
 const dbPath = path.join(__dirname, "knowyourshows.db");
 
 let db = null;
 let PORT=process.env.PORT
+
+
+// // Return "https" URLs by setting secure: true
+// cloudinary.config({
+//   secure: true,
+//   cloud_name:process.env.CLOUDINARY_NAME,
+//   api_key:process.env.CLOUDINARY_API_KEY,
+//   api_secret:process.env.CLOUDINARY_API_SECRET,
+// });
+
+
+
+
 
 const initializeDBAndServer = async () => {
   try {
@@ -33,6 +51,18 @@ const initializeDBAndServer = async () => {
 };
 
 initializeDBAndServer();
+
+
+// <<<============Image Generation through Cloudinary API=======>>>>
+// Log the configuration For Cloudinary 
+// console.log(cloudinary.config());
+
+// let result=null;
+// const image='./Images_to_url/login_bg.png'
+
+
+  
+
 
 
 //Middleware Function
@@ -60,8 +90,7 @@ const securityCheck=(request,response,next)=>{
 
 // API for Home Page.
 
-app.get("/all/", securityCheck,async (request, response) => {
-  
+app.get("/all/", securityCheck,async (request, response) => {    
     const {search,limit,offset,genre,language}=request.query;
     console.log({search,limit,offset,genre,language})
     const getAllShowsQuery = `
@@ -99,10 +128,10 @@ app.post("/signup/",async (request,response)=>{
       VALUES("${username}","${hasedPassword}","${email}");
     `
     await db.run(createUserQuery);
-    response.send("User Created Successfully");
+    response.send(JSON.stringify({success_msg:"User Created Successfully"}));
   }else{
     response.status(400);
-    response.send("User is Already Existed...");
+    response.send(JSON.stringify({error_msg:"User is Already Existed..."}));
     
   }
 })
@@ -112,12 +141,12 @@ app.post("/signup/",async (request,response)=>{
 app.post("/login/",async (request,response)=>{
   const {username,password}=request.body
 
-  const selectUserQurey=`SELECT * FROM User Where username="${username}";`
+  const selectUserQurey=`SELECT * FROM User Where username="${username}" OR email="${username}";`
   const dbUserResult=await db.get(selectUserQurey);
   
   if(dbUserResult===undefined){
     response.status(400)
-    response.send("Invalid User")
+    response.send(JSON.stringify({error_msg:"Invalid User"}))
   }else{
     const isPasswordMatched= await bcrypt.compare(password,dbUserResult.password)
     if(isPasswordMatched){
@@ -132,3 +161,19 @@ app.post("/login/",async (request,response)=>{
   }
 })
 
+
+//<<<================>>> Image API
+
+app.get("/kyslogo/",async (request,response)=>{
+  // const result = await cloudinary.uploader.upload(image)
+    // console.log(result)
+    // console.log("Inside Home All:",result.secure_url);
+  const logoQuery=`
+    SELECT
+    *
+    FROM
+    images;
+  `
+  const dbResult=await db.get(logoQuery);
+  response.send(dbResult)
+});
