@@ -3,8 +3,8 @@
 
 
 ### GET ALL SHOWS at ONCE in HOME
-GET {{SERVER_URL}}/all?search=&language=Telugu&genre=&limit=100&offset=0
-Authorization: Bearer JWT TOKEN
+GET {{SERVER_URL}}/all?search=&language=telugu&genre=&limit=100&offset=0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikh1c3NhaW4iLCJwYXNzd29yZCI6Ikh1c3NhaW5AMDAiLCJpYXQiOjE3MTk3NDQ4MzB9.D-31m3qvRcDtim1bFsuZFSqvt8RWOVuxx24S7q1T0Q8
 
 ### POST method For SignUp
 POST {{SERVER_URL}}/signup/
@@ -21,10 +21,23 @@ POST {{SERVER_URL}}/login/
 Content-Type: application/json
 
 {
-    "username":"",
-    "password":""
+    "username":"Hussain",
+    "password":"Hussain@00"
 }
 
 ### GET method for kysLogo
 
 GET {{SERVER_URL}}/kyslogo/
+
+
+### GET method for Top Telugu
+GET {{SERVER_URL}}/toptelugu/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikh1c3NhaW4iLCJwYXNzd29yZCI6Ikh1c3NhaW5AMDAiLCJpYXQiOjE3MTk3NDQ4MzB9.D-31m3qvRcDtim1bFsuZFSqvt8RWOVuxx24S7q1T0Q8
+
+### GET method for Top Telugu
+GET {{SERVER_URL}}/tophindi/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikh1c3NhaW4iLCJwYXNzd29yZCI6Ikh1c3NhaW5AMDAiLCJpYXQiOjE3MTk3NDQ4MzB9.D-31m3qvRcDtim1bFsuZFSqvt8RWOVuxx24S7q1T0Q8
+
+### GET method for Top Telugu
+GET {{SERVER_URL}}/topenglish/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikh1c3NhaW4iLCJwYXNzd29yZCI6Ikh1c3NhaW5AMDAiLCJpYXQiOjE3MTk3NDQ4MzB9.D-31m3qvRcDtim1bFsuZFSqvt8RWOVuxx24S7q1T0Q8

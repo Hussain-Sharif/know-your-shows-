@@ -177,3 +177,51 @@ app.get("/kyslogo/",async (request,response)=>{
   const dbResult=await db.get(logoQuery);
   response.send(dbResult)
 });
+
+//<<<=================>>> Top Telugu Movies
+
+app.get("/toptelugu/",securityCheck,async(request,response)=>{
+  const topTeluguQuery=`
+    SELECT 
+    * 
+    FROM 
+    Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
+    WHERE 
+    Shows.language LIKE "%Telugu%" AND Shows.show LIKE "%Evening%" 
+    LIMIT 5;
+  `
+  const dbResult=await db.all(topTeluguQuery)
+  response.send(dbResult)
+})
+
+//<<<=================>>> Top Hindi Movies
+
+app.get("/tophindi/",securityCheck,async(request,response)=>{
+  const topHindiQuery=`
+    SELECT 
+    * 
+    FROM 
+    Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
+    WHERE 
+    Shows.language LIKE "%Hindi%" AND Shows.show LIKE "%Evening%" 
+    LIMIT 5;
+  `
+  const dbResult=await db.all(topHindiQuery)
+  response.send(dbResult)
+})
+
+//<<<=================>>> Top English Movies
+
+app.get("/topenglish/",securityCheck,async(request,response)=>{
+  const topEnglishQuery=`
+    SELECT 
+    * 
+    FROM 
+    Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
+    WHERE 
+    Shows.language LIKE "%English%" AND Shows.show LIKE "%Evening%" 
+    LIMIT 5;
+  `
+  const dbResult=await db.all(topEnglishQuery)
+  response.send(dbResult)
+})
