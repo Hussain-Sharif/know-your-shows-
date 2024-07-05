@@ -1,113 +1,120 @@
-require('dotenv').config()
-const express = require('express');
-// The error you're encountering is a Cross-Origin Resource Sharing (CORS) issue. CORS is a security feature implemented by web browsers to prevent web pages from making requests to a different domain than the one that served the web page.
-const cros=require("cors")
-// Image to generate local to URL
-// const cloudinary=require("cloudinary")
-const bcrypt=require("bcrypt")
-const jwt=require("jsonwebtoken")
-const path = require('path') 
+  require('dotenv').config()
+  const express = require('express');
+  // The error you're encountering is a Cross-Origin Resource Sharing (CORS) issue. CORS is a security feature implemented by web browsers to prevent web pages from making requests to a different domain than the one that served the web page.
+  const cros=require("cors")
+  // Image to generate local to URL
+  // const cloudinary=require("cloudinary")
+  const bcrypt=require("bcrypt")
+  const jwt=require("jsonwebtoken")
+  const path = require('path') 
 
-const {open}=require('sqlite');
-const sqlite3=require('sqlite3');
+  const {open}=require('sqlite');
+  const sqlite3=require('sqlite3');
 
-const app=express(); //Server instance
+  const app=express(); //Server instance
 
-app.use(cros())
-app.use(express.json())
-
-
-const dbPath = path.join(__dirname, "knowyourshows.db");
-
-let db = null;
-let PORT=process.env.PORT
+  app.use(cros())
+  app.use(express.json())
 
 
-// // Return "https" URLs by setting secure: true
-// cloudinary.config({
-//   secure: true,
-//   cloud_name:process.env.CLOUDINARY_NAME,
-//   api_key:process.env.CLOUDINARY_API_KEY,
-//   api_secret:process.env.CLOUDINARY_API_SECRET,
-// });
+  const dbPath = path.join(__dirname, "knowyourshows.db");
+
+  let db = null;
+  let PORT=process.env.PORT
 
 
+  // // Return "https" URLs by setting secure: true
+  // cloudinary.config({
+  //   secure: true,
+  //   cloud_name:process.env.CLOUDINARY_NAME,
+  //   api_key:process.env.CLOUDINARY_API_KEY,
+  //   api_secret:process.env.CLOUDINARY_API_SECRET,
+  // });
 
 
 
-const initializeDBAndServer = async () => {
-  try {
-    db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database,
-    });
-    app.listen( PORT, () => {
-      console.log(`Server Running at http://localhost:${PORT}/`);
-    });
-  } catch (e) {
-    console.log(`DB Error: ${e.message}`);
-    process.exit(1);
+
+
+  const initializeDBAndServer = async () => {
+    try {
+      db = await open({
+        filename: dbPath,
+        driver: sqlite3.Database,
+      });
+      app.listen( PORT, () => {
+        console.log(`Server Running at http://localhost:${PORT}/`);
+      });
+    } catch (e) {
+      console.log(`DB Error: ${e.message}`);
+      process.exit(1);
+    }
+  };
+
+  initializeDBAndServer();
+
+
+  // <<<============Image Generation through Cloudinary API=======>>>>
+  // Log the configuration For Cloudinary 
+  // console.log(cloudinary.config());
+
+  // let result=null;
+  // const image='./Images_to_url/login_bg.png'
+
+
+    
+
+
+
+  //Middleware Function
+  const securityCheck=(request,response,next)=>{
+    let jwtToken;
+    const authHeader=request.headers["authorization"]
+    if(authHeader!==undefined){
+        jwtToken=authHeader.split(" ")[1]
+    }
+    if(jwtToken===undefined){
+      response.status(401);
+      response.send("Invalid Access Token")
+    }else{
+      jwt.verify(jwtToken,"Secret_key",async(err,user)=>{
+        if(err){
+          response.send("Invalid JWT Token")
+        }else{
+          next()
   }
-};
-
-initializeDBAndServer();
-
-
-// <<<============Image Generation through Cloudinary API=======>>>>
-// Log the configuration For Cloudinary 
-// console.log(cloudinary.config());
-
-// let result=null;
-// const image='./Images_to_url/login_bg.png'
-
-
-  
-
-
-
-//Middleware Function
-const securityCheck=(request,response,next)=>{
-  let jwtToken;
-  const authHeader=request.headers["authorization"]
-  if(authHeader!==undefined){
-      jwtToken=authHeader.split(" ")[1]
+  })
   }
-  if(jwtToken===undefined){
-    response.status(401);
-    response.send("Invalid Access Token")
-  }else{
-    jwt.verify(jwtToken,"Secret_key",async(err,user)=>{
-      if(err){
-        response.send("Invalid JWT Token")
-      }else{
-        next()
-}
-})
-}
-}
-// <<<<============>>>>> API'S
+  }
+  // <<<<============>>>>> API'S
 
 
-// API for Home Page.
+  // API for Home Page.
 
-app.get("/all/", securityCheck,async (request, response) => {    
-    const {search,limit,offset,genre,language}=request.query;
-    console.log({search,limit,offset,genre,language})
-    const getAllShowsQuery = `
-      SELECT 
-        * 
-        FROM 
-        Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
-        WHERE 
-        ((Shows.language LIKE "%${language}%") AND (Channels.genre Like "%${genre}%") AND ((Channels.channel like "%${search}%" OR Shows.show like "%${search}%")))
-        LIMIT ${limit} OFFSET ${offset};;
-        `;
-    const showsArray = await db.all(getAllShowsQuery);
-    console.log("Array Length: ",showsArray.length)
-    response.send(showsArray);
-  
+  app.get("/all/", securityCheck,async (request, response) => {    
+      const {search,limit,offset}=request.query;
+      console.log({search,limit,offset})
+      const getAllShowsQuery = `
+        SELECT 
+          Shows.id,
+          Shows.channel_id,
+          Channels.channel,
+          Channels.genre,
+          Shows.show,
+          Shows.start_of_show,
+          Shows.end_of_show,
+          Shows.language 
+          FROM 
+          Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
+          WHERE 
+          ((Shows.language LIKE "%${search}%") AND (Channels.genre Like "%${search}%") AND ((Channels.channel like "%${search}%" OR Shows.show like "%${search}%")))
+          LIMIT ${limit} OFFSET ${offset};
+          `;
+      const showsArray = await db.all(getAllShowsQuery);
+      console.log("Array Length: ",showsArray.length)
+      response.send(showsArray);
+    
 
-  });
+    });
 
 
 
