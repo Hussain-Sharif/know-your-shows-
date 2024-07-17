@@ -3,7 +3,7 @@
 
 
 ### GET ALL SHOWS at ONCE in HOME
-GET {{SERVER_URL}}/all?search=&limit=100&offset=0
+GET {{SERVER_URL}}/all?search=life&limit=100&offset=0
 Authorization: Bearer 
 
 ### POST method For SignUp

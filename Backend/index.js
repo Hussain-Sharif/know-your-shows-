@@ -93,7 +93,8 @@
   app.get("/all/", securityCheck,async (request, response) => {    
       const {search,limit,offset}=request.query;
       console.log({search,limit,offset})
-      const getAllShowsQuery = `
+      let dbReuslt;
+      const getLanguageQuery = `
         SELECT 
           Shows.id,
           Shows.channel_id,
@@ -106,18 +107,59 @@
           FROM 
           Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
           WHERE 
-          ((Shows.language LIKE "%${search}%") AND (Channels.genre Like "%${search}%") AND ((Channels.channel like "%${search}%" OR Shows.show like "%${search}%")))
+          Shows.language LIKE "%${search}%"
           LIMIT ${limit} OFFSET ${offset};
           `;
-      const showsArray = await db.all(getAllShowsQuery);
-      console.log("Array Length: ",showsArray.length)
-      response.send(showsArray);
+      dbReuslt = await db.all(getLanguageQuery);
+      console.log("Array Length of Language: ",dbReuslt.length)
+      if(dbReuslt.length===0){
+        const getGenreQuery = `
+          SELECT 
+            Shows.id,
+            Shows.channel_id,
+            Channels.channel,
+            Channels.genre,
+            Shows.show,
+            Shows.start_of_show,
+            Shows.end_of_show,
+            Shows.language 
+            FROM 
+            Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
+            WHERE 
+            Channels.genre Like "%${search}%"
+            LIMIT ${limit} OFFSET ${offset};
+            `;
+        dbReuslt = await db.all(getGenreQuery);
+        console.log("Array Length of Genre's: ",dbReuslt.length)
+      }
+
+      if(dbReuslt.length===0){
+        const getNamesQuery = `
+          SELECT 
+            Shows.id,
+            Shows.channel_id,
+            Channels.channel,
+            Channels.genre,
+            Shows.show,
+            Shows.start_of_show,
+            Shows.end_of_show,
+            Shows.language 
+            FROM 
+            Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
+            WHERE 
+            (Channels.channel like "%${search}%" OR Shows.show like "%${search}%")
+            LIMIT ${limit} OFFSET ${offset};
+            `;
+        dbReuslt = await db.all(getNamesQuery);
+        console.log("Array Length of channel,shows Names: ",dbReuslt.length)
+      }
+      
+      response.send(dbReuslt);
     
 
     });
 
-
-
+    
 // API For Sign Up
 
 app.post("/signup/",async (request,response)=>{
