@@ -91,8 +91,20 @@
   // API for Home Page.
 
   app.get("/all/", securityCheck,async (request, response) => {    
-      const {search,limit,offset}=request.query;
-      console.log({search,limit,offset})
+      const {search,limit,offset,userid}=request.query;
+      console.log({search,limit,offset,userid})
+
+      // Likes View Query 
+      const likesViewQuery=`
+        CREATE TEMP VIEW IF NOT EXISTS user${userid}_likes_showids AS
+        SELECT show_id,isLiked
+        FROM 
+        Likes
+        WHERE user_id=${userid}
+      `
+      await db.run(likesViewQuery)
+
+      // DB Result For Language
       let dbReuslt;
       const getLanguageQuery = `
         SELECT 
@@ -103,9 +115,11 @@
           Shows.show,
           Shows.start_of_show,
           Shows.end_of_show,
-          Shows.language 
+          Shows.language,
+          user${userid}_likes_showids.isLiked
           FROM 
-          Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
+          (Shows LEFT JOIN user${userid}_likes_showids ON Shows.id=user${userid}_likes_showids.show_id) AS ShowsWithLikes
+          LEFT JOIN Channels ON  ShowsWithLikes.channel_id=Channels.id 
           WHERE 
           Shows.language LIKE "%${search}%"
           LIMIT ${limit} OFFSET ${offset};
@@ -113,6 +127,8 @@
       dbReuslt = await db.all(getLanguageQuery);
       console.log("Array Length of Language: ",dbReuslt.length)
       if(dbReuslt.length===0){
+
+        // DB Result For Genre
         const getGenreQuery = `
           SELECT 
             Shows.id,
@@ -122,9 +138,11 @@
             Shows.show,
             Shows.start_of_show,
             Shows.end_of_show,
-            Shows.language 
-            FROM 
-            Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
+            Shows.language,
+          user${userid}_likes_showids.isLiked
+          FROM 
+          (Shows LEFT JOIN user${userid}_likes_showids ON Shows.id=user${userid}_likes_showids.show_id) AS ShowsWithLikes
+          LEFT JOIN Channels ON  ShowsWithLikes.channel_id=Channels.id
             WHERE 
             Channels.genre Like "%${search}%"
             LIMIT ${limit} OFFSET ${offset};
@@ -134,6 +152,7 @@
       }
 
       if(dbReuslt.length===0){
+        // DB Result For Show name OR Channel Name
         const getNamesQuery = `
           SELECT 
             Shows.id,
@@ -143,9 +162,11 @@
             Shows.show,
             Shows.start_of_show,
             Shows.end_of_show,
-            Shows.language 
-            FROM 
-            Shows INNER JOIN Channels ON  Shows.channel_id=Channels.id
+            Shows.language,
+          user${userid}_likes_showids.isLiked
+          FROM 
+          (Shows LEFT JOIN user${userid}_likes_showids ON Shows.id=user${userid}_likes_showids.show_id) AS ShowsWithLikes
+          LEFT JOIN Channels ON  ShowsWithLikes.channel_id=Channels.id
             WHERE 
             (Channels.channel like "%${search}%" OR Shows.show like "%${search}%")
             LIMIT ${limit} OFFSET ${offset};
@@ -201,8 +222,9 @@ app.post("/login/",async (request,response)=>{
     if(isPasswordMatched){
       const payload={username,password}
       const jwtToken=jwt.sign(payload,"Secret_key");
+      const userId=dbUserResult["id"]
       response.status(200)
-      response.send({jwtToken})
+      response.send({jwtToken,userId})
     }else{
       response.status(400)
       response.send("Invalid Password");
