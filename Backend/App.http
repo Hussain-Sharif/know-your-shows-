@@ -3,7 +3,15 @@
 
 
 ### GET ALL SHOWS at ONCE in HOME
-GET {{SERVER_URL}}/all?search=gold&limit=100&offset=0&userid=3
+GET {{SERVER_URL}}/all?search=telugu&limit=100&offset=0&userid=3
+Authorization: Bearer 
+
+### GET ALL SHOWS at ONCE in LIKES
+GET {{SERVER_URL}}/all_likes?search=telugu&userid=3
+Authorization: Bearer 
+
+### GET ALL SHOWS at ONCE in REMAINDERS
+GET {{SERVER_URL}}/all_remainders?search=telugu&userid=3
 Authorization: Bearer 
 
 
@@ -17,7 +25,7 @@ Content-Type: application/json
     "email":""
 }
 
-### POST method For Login
+### POST method For Login-app
 POST {{SERVER_URL}}/login/
 Content-Type: application/json
 
@@ -41,4 +49,35 @@ Authorization: Bearer
 
 ### GET method for Top Telugu
 GET {{SERVER_URL}}/topenglish/
+Authorization: Bearer 
+
+
+### POST mehtod for Remainders by User
+POST {{SERVER_URL}}/show_remainded/
+Content-Type: application/json
+Authorization: Bearer 
+
+{
+    "showid":,
+    "userid":
+}
+
+### POST mehtod for Remainder by User
+DELETE  {{SERVER_URL}}/show_remainder_delete/?showid=14&userid=3
+Authorization: Bearer 
+
+
+
+### POST mehtod for Likes by User
+POST {{SERVER_URL}}/showliked/
+Content-Type: application/json
+Authorization: Bearer 
+
+{
+    "showid":,
+    "userid":
+}
+
+### POST mehtod for Likes by User
+DELETE  {{SERVER_URL}}/showlikedelete/?showid=2&userid=3
 Authorization: Bearer 
