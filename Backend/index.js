@@ -1,9 +1,6 @@
   require('dotenv').config()
   const express = require('express');
-  // The error you're encountering is a Cross-Origin Resource Sharing (CORS) issue. CORS is a security feature implemented by web browsers to prevent web pages from making requests to a different domain than the one that served the web page.
   const cors=require("cors")
-  // Image to generate local to URL
-  // const cloudinary=require("cloudinary")
   const bcrypt=require("bcrypt")
   const jwt=require("jsonwebtoken")
   const path = require('path') 
@@ -12,11 +9,12 @@
   const sqlite3=require('sqlite3');
 
   const app=express(); //Server instance
-
-  app.use(cors())
+ 
+  app.use(cors({
+    origin: '*' // replace with your frontend's origin
+}));
   app.use(express.json())
 
-  app.options('*', cors());
 
   const dbPath = path.join(__dirname, "knowyourshows.db");
 
